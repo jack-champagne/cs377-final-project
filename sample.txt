@@ -1,0 +1,10 @@
+disk0
+C file1 3
+W file1 0
+W file1 1
+C lab.java 7
+L
+C file2 4
+R file1 1
+D lab.java
+L

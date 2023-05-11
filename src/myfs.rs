@@ -1,6 +1,7 @@
+
 use std::fs::{File, OpenOptions};
 
-    const BLOCK_SIZE: usize = 1024;
+    pub const BLOCK_SIZE: usize = 1024;
     const FREE_BLOCK_SIZE: usize = 128;
     const MAX_INODES: usize = 16;
 
@@ -16,7 +17,7 @@ use std::fs::{File, OpenOptions};
     }
 
     impl MyFileSystem {
-        pub fn new(disk_name: String) -> MyFileSystem {
+        pub fn new(disk_name: &str) -> MyFileSystem {
             MyFileSystem { 
                 disk: match OpenOptions::new().read(true).write(true).open(&disk_name) {
                     Ok(disk) => disk,
