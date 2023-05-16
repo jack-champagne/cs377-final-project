@@ -143,3 +143,5 @@ use std::{fs::{File, OpenOptions}, io::{Seek, Read, Write}};
             drop(self.disk);
         }
     }
+
+// Written by Jack Champagne
