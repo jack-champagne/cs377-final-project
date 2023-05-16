@@ -23,7 +23,7 @@ fn main() {
     my_file_system.close_disk();
 }
 
-fn get_filename_array(filename: &str) -> [u8; 8] {
+pub fn get_filename_array(filename: &str) -> [u8; 8] {
     let mut filename_array: [u8; 8] = [0 ; 8];
     let bytes = filename.as_bytes();
     for i in 0..bytes.len().min(8) {

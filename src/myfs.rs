@@ -75,6 +75,9 @@ impl MyFileSystem {
         if available_blocks < size {
             return Err(String::from("Not enough free blocks"));
         }
+        if size > 8 {
+            return Err(String::from(format!("Max blocks per file is 8, not {}", size)))
+        }
         
         let mut inode = self.find_inode_cond(|i| i.used == 0)?;
 
@@ -143,5 +146,46 @@ impl MyFileSystem {
         drop(self.disk);
     }
 }
-
 // Written by Jack Champagne
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::process::{Command, Stdio};
+    fn setup() {
+
+        Command::new("./create_fs")
+        .arg("disk0")
+        .stdout(Stdio::null())
+        .spawn()
+        .expect("sh command failed to start");
+    }
+
+    #[test]
+    #[should_panic]
+    fn bad_fs() {
+        setup();
+        let mut my_fs = MyFileSystem::new("diskL");
+        my_fs.create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 7).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn bad_file() {
+        setup();
+        let mut my_fs = MyFileSystem::new("disk0");
+        my_fs.create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 100).unwrap();
+    }
+
+    #[test]
+    fn good_file_ops() {
+        setup();
+        let mut my_fs = MyFileSystem::new("disk0");
+        let my_filename = crate::get_filename_array("testfile");
+        my_fs.create_file(my_filename, 8).unwrap();
+        my_fs.write(my_filename, 1, [12; BLOCK_SIZE]);
+        let buf = [0; BLOCK_SIZE];
+        assert!(my_fs.read(my_filename, 0).unwrap() == buf);
+        assert!(my_fs.read(my_filename, 1).unwrap() != buf);
+    }
+}
