@@ -19,9 +19,9 @@ The executables are 'create_fs' and 'fs_app' inside of the targets/debug or targ
 
 Run them like so if they are in targets/debug for example
 ```bash
-./targets/debug/create_fs disk0
+cargo run --bin create_fs disk0
 ```
 
 ```bash
-./targets/debug/fs_app sample.txt
+cargo run --bin fs_app .\sample.txt
 ```
