@@ -7,3 +7,11 @@ author = "Jack Champagne"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[[bin]]
+name = "fs_app"
+path = "src/main.rs"
+
+[[bin]]
+name = "create_fs"
+path = "src/create_fs.rs"
