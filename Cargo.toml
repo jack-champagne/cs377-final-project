@@ -1,5 +1,5 @@
 [package]
-name = "intro_filesystem"
+name = "cs377_filesystem"
 version = "0.1.0"
 edition = "2021"
 author = "Jack Champagne"

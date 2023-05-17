@@ -4,7 +4,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-mod myfs;
+use cs377_filesystem::myfs;
 
 const BUFFER_SIZE: usize = myfs::BLOCK_SIZE;
 const BUFF: [u8; BUFFER_SIZE] = [b'1'; BUFFER_SIZE];
@@ -51,7 +51,9 @@ fn do_file_op(my_fs: &mut myfs::MyFileSystem, line: &mut String) {
         'W' => {
             let filename = get_filename_array(args[0]);
             let block_num = args[1].parse().unwrap();
-            my_fs.write(filename, block_num, BUFF);
+            my_fs
+                .write(filename, block_num, &BUFF)
+                .expect("Writing failed");
         }
         'L' => {
             my_fs.ls();
@@ -59,14 +61,18 @@ fn do_file_op(my_fs: &mut myfs::MyFileSystem, line: &mut String) {
         'R' => {
             let filename = get_filename_array(args[0]);
             let block_num = args[1].parse().unwrap();
-            match my_fs.read(filename, block_num) {
-                Some(block) => println!("{:?}", std::str::from_utf8(&block)),
-                None => todo!(),
-            };
+            println!(
+                "{}",
+                String::from_utf8_lossy(
+                    &my_fs
+                        .read(filename, block_num)
+                        .expect("Reading block failed")
+                )
+            );
         }
         'D' => {
             let filename = get_filename_array(args[0]);
-            my_fs.delete_file(filename);
+            my_fs.delete_file(filename).expect("Deleting file failed");
         }
         _ => (),
     }

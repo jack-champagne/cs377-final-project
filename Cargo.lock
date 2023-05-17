@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "intro_filesystem"
+name = "cs377_filesystem"
 version = "0.1.0"
