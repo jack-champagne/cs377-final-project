@@ -349,11 +349,19 @@ mod tests {
     use crate::myfs::*;
     use std::process::{Command, Stdio};
     fn setup() {
-        Command::new("./create_fs")
+        if cfg!(windows) {
+            Command::new("./create_fs.exe")
             .arg("disk0")
             .stdout(Stdio::null())
             .spawn()
             .expect("create_fs failed to run");
+        } else if cfg!(unix) {
+            Command::new("./create_fs")
+            .arg("disk0")
+            .stdout(Stdio::null())
+            .spawn()
+            .expect("create_fs failed to run");
+        }        
     }
 
     #[test]
