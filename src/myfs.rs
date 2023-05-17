@@ -1,5 +1,7 @@
-
-use std::{fs::{File, OpenOptions}, io::{Seek, Read, Write}};
+use std::{
+    fs::{File, OpenOptions},
+    io::{Read, Seek, Write},
+};
 
 pub const BLOCK_SIZE: usize = 1024;
 const FREE_BLOCK_SIZE: usize = 128;
@@ -8,7 +10,7 @@ const IDXNODE_SIZE: usize = std::mem::size_of::<IDXNode>();
 
 #[derive(Debug)]
 struct IDXNode {
-    name : [u8; 8],
+    name: [u8; 8],
     size: u8,
     block_pointers: [u8; 8],
     used: u8,
@@ -20,28 +22,30 @@ pub struct MyFileSystem {
 
 impl MyFileSystem {
     pub fn new(disk_name: &str) -> MyFileSystem {
-        MyFileSystem { 
+        MyFileSystem {
             disk: match OpenOptions::new().read(true).write(true).open(&disk_name) {
                 Ok(disk) => disk,
                 Err(_) => panic!("Could not open disk: {}", &disk_name),
-            }
+            },
         }
     }
 
     fn get_inode(&mut self, inode_index: usize) -> IDXNode {
         let mut inode_buffer = [0u8; IDXNODE_SIZE];
-        self.disk.seek(std::io::SeekFrom::Start((FREE_BLOCK_SIZE + IDXNODE_SIZE * inode_index) as u64)).unwrap();
+        self.disk
+            .seek(std::io::SeekFrom::Start(
+                (FREE_BLOCK_SIZE + IDXNODE_SIZE * inode_index) as u64,
+            ))
+            .unwrap();
         self.disk.read(&mut inode_buffer).unwrap();
-            unsafe {
-                std::mem::transmute::<[u8; IDXNODE_SIZE], IDXNode>(inode_buffer)
-            }
+        unsafe { std::mem::transmute::<[u8; IDXNODE_SIZE], IDXNode>(inode_buffer) }
     }
 
     fn find_inode_cond(&mut self, f: impl Fn(&IDXNode) -> bool) -> Result<IDXNode, &str> {
         for i in 0..MAX_INODES {
             let inode = self.get_inode(i);
             if f(&inode) {
-                return Ok(inode)
+                return Ok(inode);
             }
         }
         Err("Could not find inode")
@@ -53,10 +57,10 @@ impl MyFileSystem {
     }
 
     fn write_inode(&mut self, inode: IDXNode) {
-        let inode_buffer = unsafe {
-            std::mem::transmute::<IDXNode, [u8; IDXNODE_SIZE]>(inode)
-        };
-        self.disk.seek(std::io::SeekFrom::Current(-(IDXNODE_SIZE as i64))).unwrap();
+        let inode_buffer = unsafe { std::mem::transmute::<IDXNode, [u8; IDXNODE_SIZE]>(inode) };
+        self.disk
+            .seek(std::io::SeekFrom::Current(-(IDXNODE_SIZE as i64)))
+            .unwrap();
         self.disk.write(&inode_buffer).unwrap();
     }
 
@@ -64,21 +68,25 @@ impl MyFileSystem {
         self.disk.seek(std::io::SeekFrom::Start(0)).unwrap();
         let mut free_block_list: [u8; FREE_BLOCK_SIZE] = [0; FREE_BLOCK_SIZE];
         self.disk.read(&mut free_block_list).unwrap();
-        return free_block_list
-        
+        return free_block_list;
     }
 
-    pub fn create_file(&mut self, filename: [u8; 8], size: u8) -> Result<(), String>{
+    pub fn create_file(&mut self, filename: [u8; 8], size: u8) -> Result<(), String> {
         // println!("creating {:?}: size: {size}", std::str::from_utf8(&filename).unwrap());
         let mut free_block_list = self.get_free_block_list();
-        let available_blocks = free_block_list.iter().fold(0, |acc, &x| if x == 0 { acc + 1 } else { acc });
+        let available_blocks = free_block_list
+            .iter()
+            .fold(0, |acc, &x| if x == 0 { acc + 1 } else { acc });
         if available_blocks < size {
             return Err(String::from("Not enough free blocks"));
         }
         if size > 8 {
-            return Err(String::from(format!("Max blocks per file is 8, not {}", size)))
+            return Err(String::from(format!(
+                "Max blocks per file is 8, not {}",
+                size
+            )));
         }
-        
+
         let mut inode = self.find_inode_cond(|i| i.used == 0)?;
 
         inode.used = 1;
@@ -99,7 +107,7 @@ impl MyFileSystem {
 
         self.write_inode(inode);
         self.write_free_block_list(free_block_list);
-        return Ok(())
+        return Ok(());
     }
 
     pub fn delete_file(&mut self, filename: [u8; 8]) {
@@ -127,9 +135,13 @@ impl MyFileSystem {
         if let Ok(inode) = self.find_inode_cond(|x| x.name == filename) {
             let block = inode.block_pointers[block_num as usize];
             let mut buf: [u8; BLOCK_SIZE] = [0; BLOCK_SIZE];
-            self.disk.seek(std::io::SeekFrom::Start((FREE_BLOCK_SIZE + BLOCK_SIZE * block as usize) as u64)).unwrap();
+            self.disk
+                .seek(std::io::SeekFrom::Start(
+                    (FREE_BLOCK_SIZE + BLOCK_SIZE * block as usize) as u64,
+                ))
+                .unwrap();
             self.disk.read(&mut buf).unwrap();
-            return Some(buf)
+            return Some(buf);
         }
         None
     }
@@ -137,7 +149,11 @@ impl MyFileSystem {
     pub fn write(&mut self, filename: [u8; 8], block_num: u8, write_buf: [u8; BLOCK_SIZE]) {
         if let Ok(inode) = self.find_inode_cond(|x| x.name == filename) {
             let block = inode.block_pointers[block_num as usize];
-            self.disk.seek(std::io::SeekFrom::Start((FREE_BLOCK_SIZE + BLOCK_SIZE * block as usize) as u64)).unwrap();
+            self.disk
+                .seek(std::io::SeekFrom::Start(
+                    (FREE_BLOCK_SIZE + BLOCK_SIZE * block as usize) as u64,
+                ))
+                .unwrap();
             self.disk.write(&write_buf).unwrap();
         }
     }
@@ -153,12 +169,11 @@ mod tests {
     use super::*;
     use std::process::{Command, Stdio};
     fn setup() {
-
         Command::new("./create_fs")
-        .arg("disk0")
-        .stdout(Stdio::null())
-        .spawn()
-        .expect("sh command failed to start");
+            .arg("disk0")
+            .stdout(Stdio::null())
+            .spawn()
+            .expect("sh command failed to start");
     }
 
     #[test]
@@ -166,7 +181,9 @@ mod tests {
     fn bad_fs() {
         setup();
         let mut my_fs = MyFileSystem::new("diskL");
-        my_fs.create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 7).unwrap();
+        my_fs
+            .create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 7)
+            .unwrap();
     }
 
     #[test]
@@ -174,7 +191,9 @@ mod tests {
     fn bad_file() {
         setup();
         let mut my_fs = MyFileSystem::new("disk0");
-        my_fs.create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 100).unwrap();
+        my_fs
+            .create_file([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8], 100)
+            .unwrap();
     }
 
     #[test]

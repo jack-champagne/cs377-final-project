@@ -1,4 +1,8 @@
-use std::{env::args_os, fs::File, io::{BufReader, BufRead}};
+use std::{
+    env::args_os,
+    fs::File,
+    io::{BufRead, BufReader},
+};
 
 mod myfs;
 
@@ -17,14 +21,14 @@ fn main() {
     let reader = BufReader::new(instruction_file);
 
     for result in reader.lines() {
-        let mut line_string =  result.unwrap();
+        let mut line_string = result.unwrap();
         do_file_op(&mut my_file_system, &mut line_string)
     }
     my_file_system.close_disk();
 }
 
 pub fn get_filename_array(filename: &str) -> [u8; 8] {
-    let mut filename_array: [u8; 8] = [0 ; 8];
+    let mut filename_array: [u8; 8] = [0; 8];
     let bytes = filename.as_bytes();
     for i in 0..bytes.len().min(8) {
         filename_array[i] = bytes[i];
@@ -40,16 +44,18 @@ fn do_file_op(my_fs: &mut myfs::MyFileSystem, line: &mut String) {
         'C' => {
             let filename = get_filename_array(args[0]);
             let size = args[1].parse().unwrap();
-            my_fs.create_file(filename, size).expect("Creation of file failed");
-        },
+            my_fs
+                .create_file(filename, size)
+                .expect("Creation of file failed");
+        }
         'W' => {
             let filename = get_filename_array(args[0]);
             let block_num = args[1].parse().unwrap();
             my_fs.write(filename, block_num, BUFF);
-        },
+        }
         'L' => {
             my_fs.ls();
-        },
+        }
         'R' => {
             let filename = get_filename_array(args[0]);
             let block_num = args[1].parse().unwrap();
@@ -61,7 +67,7 @@ fn do_file_op(my_fs: &mut myfs::MyFileSystem, line: &mut String) {
         'D' => {
             let filename = get_filename_array(args[0]);
             my_fs.delete_file(filename);
-        },
+        }
         _ => (),
     }
 }
