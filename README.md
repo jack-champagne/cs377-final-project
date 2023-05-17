@@ -6,9 +6,9 @@ Author: Jack Champagne
 This project aims to implement as closely as possible project 6 (File systems) in the Rust programming language.
 
 Things that will be directly translated:
-[X] - main.cpp
-[X] - fs.cpp
-[X] - create_fs.cpp
+- [X] - main.cpp
+- [X] - fs.cpp
+- [X] - create_fs.cpp
 
 ## Usage 
 After cloning
