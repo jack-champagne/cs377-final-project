@@ -29,6 +29,7 @@ pub mod myfs {
     Here, with as faithful as an adaptation as possible to the original, the
     filesystem is a wrapper around a file stream.
     */
+    #[derive(Debug)]
     pub struct MyFileSystem {
         disk: File,
     }
@@ -350,13 +351,13 @@ mod tests {
     use std::process::{Command, Stdio};
     fn setup() {
         if cfg!(windows) {
-            Command::new("./create_fs.exe")
+            Command::new("./target/debug/create_fs.exe")
             .arg("disk0")
             .stdout(Stdio::null())
             .spawn()
             .expect("create_fs failed to run");
         } else if cfg!(unix) {
-            Command::new("./create_fs")
+            Command::new("./target/debug/create_fs")
             .arg("disk0")
             .stdout(Stdio::null())
             .spawn()
