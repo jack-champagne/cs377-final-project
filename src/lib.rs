@@ -167,7 +167,7 @@ pub mod myfs {
         /// let mut my_file_system = myfs::MyFileSystem::new("disk0");
         /// let filename: [u8; 8] = [102, 105, 108, 101, 49, 0, 0, 0]; //file1 as [u8; 8]
         /// my_file_system.create_file(filename, 8);
-        /// println!(my_file_system.read(filename, 7));
+        /// println!("{:?}", my_file_system.read(filename, 7));
         /// ```
         ///
         /// This will output one of the following assuming disk0 exists and the read was successful or not:
@@ -209,8 +209,8 @@ pub mod myfs {
         /// let filename: [u8; 8] = [102, 105, 108, 101, 49, 0, 0, 0]; //file1 as [u8; 8]
         /// let my_new_data = [69u8; myfs::BLOCK_SIZE];
         /// my_file_system.create_file(filename, 3);
-        /// my_filesystem.write(filename, &my_new_data, 2)
-        /// println!(my_file_system.read(filename, 2));
+        /// my_file_system.write(filename, 2, &my_new_data);
+        /// println!("{:?}", my_file_system.read(filename, 2));
         /// ```
         ///
         /// This will output one of the following assuming disk0 exists and the write was successful or not:
