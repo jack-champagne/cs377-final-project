@@ -3,12 +3,16 @@ use std::{
     io::{Read, Seek, Write},
 };
 
-pub const BLOCK_SIZE: usize = 1024;
-const FREE_BLOCK_SIZE: usize = 128;
-const MAX_INODES: usize = 16;
-const IDXNODE_SIZE: usize = std::mem::size_of::<IDXNode>();
-
-#[derive(Debug)]
+/*
+Equivalent to `idxNode` struct in original implementation however
+to have equivalent byte representation after a std::mem::transmute,
+it is necessary to define a repr, hence #[repr(C)]. Additionally,
+the original project has the block_pointers field as an array of ints
+even though there are only 128 blocks total, so it really should be an
+array of u8 instead. I have opted to keep the original project format
+for compatibility.
+*/
+#[repr(C)]
 struct IDXNode {
     name: [u8; 8],
     size: u8,
@@ -19,6 +23,12 @@ struct IDXNode {
 pub struct MyFileSystem {
     disk: File,
 }
+
+pub const BLOCK_SIZE: usize = 1024;
+const FREE_BLOCK_SIZE: usize = 128;
+const MAX_INODES: usize = 16;
+const IDXNODE_SIZE: usize = std::mem::size_of::<IDXNode>();
+
 
 impl MyFileSystem {
     pub fn new(disk_name: &str) -> MyFileSystem {
