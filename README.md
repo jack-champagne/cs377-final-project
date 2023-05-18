@@ -34,4 +34,6 @@ For complete project documentation, please visit the following link:
 This is inside of the docs folder of this repo and was generated using `cargo docs`
 
 Thank you!
-[video link](https://drive.google.com/file/d/1Gn_qg5na7ovBd9c0qVrwtowGLSBEo3w0/view?usp=share_link)
+
+## Final Presentation video
+[https://drive.google.com/file/d/1Gn_qg5na7ovBd9c0qVrwtowGLSBEo3w0/view?usp=share_link](https://drive.google.com/file/d/1Gn_qg5na7ovBd9c0qVrwtowGLSBEo3w0/view?usp=share_link)
