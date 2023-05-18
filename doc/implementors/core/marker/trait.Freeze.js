@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"cs377_filesystem":[["impl Freeze for <a class=\"struct\" href=\"cs377_filesystem/myfs/struct.MyFileSystem.html\" title=\"struct cs377_filesystem::myfs::MyFileSystem\">MyFileSystem</a>",1,["cs377_filesystem::myfs::MyFileSystem"]]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
