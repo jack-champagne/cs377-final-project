@@ -28,7 +28,9 @@ cargo run --bin fs_app .\sample.txt
 
 ## Documentation
 For complete project documentation, please visit the following link:
+
 **[rustdoc docs on github pages](https://jack-champagne.github.io/cs377-final-project/cs377_filesystem/index.html)**
+
 This is inside of the docs folder of this repo and was generated using `cargo docs`
 
 Thank you!
